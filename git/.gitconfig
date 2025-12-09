@@ -1,0 +1,26 @@
+[user]
+	name = {{GIT_USER_NAME}}
+	email = {{GIT_USER_EMAIL}}
+[ghq]
+	root = {{HOME}}/workspaces
+[core]
+	autocrlf = input
+	editor = nvim
+	pager = delta
+[credential]
+	helper = /mnt/c/Program\\ Files/Git/mingw64/bin/git-credential-manager.exe
+[interactive]
+	diffFilter = delta --color-only
+[delta]
+	side-by-side = true
+	hyperlinks = true
+	syntax-theme = Dracula
+	file-style = bold yellow ul
+	file-decoration-style = none
+	hunk-header-style = omit
+	line-numbers-left-style = white
+	line-numbers-right-style = white
+[merge]
+	conflictstyle = zdiff3
+[diff]
+	colorMoved = default

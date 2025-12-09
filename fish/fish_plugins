@@ -1,0 +1,4 @@
+# setup.shで管理するパッケージ
+jorgebucaran/fisher
+decors/fish-ghq
+jorgebucaran/nvm.fish

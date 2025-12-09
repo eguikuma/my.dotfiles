@@ -1,0 +1,8 @@
+#
+.*/
+!.gitignore
+
+# markdown
+*.md
+!README.md
+!SETUP.md

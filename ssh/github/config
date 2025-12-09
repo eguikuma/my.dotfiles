@@ -1,0 +1,8 @@
+Host github.com github.com--{{GIT_USER_NAME}}
+  HostName github.com
+  IdentityFile ~/.ssh/github/{{SSH_KEY_NAME}}
+  User git
+  Port 22
+  TCPKeepAlive yes
+  AddKeysToAgent yes
+  IdentitiesOnly yes

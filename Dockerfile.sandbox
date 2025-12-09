@@ -1,0 +1,45 @@
+FROM ubuntu:24.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=Asia/Tokyo
+
+RUN apt-get update && apt-get install -y \
+  sudo \
+  curl \
+  git \
+  fontconfig \
+  locales \
+  ca-certificates \
+  software-properties-common \
+  && rm -rf /var/lib/apt/lists/*
+
+RUN add-apt-repository -y ppa:fish-shell/release-4 && \
+  apt-get update && \
+  apt-get install -y fish && \
+  rm -rf /var/lib/apt/lists/*
+
+RUN locale-gen en_US.UTF-8 ja_JP.UTF-8
+ENV LANG=en_US.UTF-8
+ENV LANGUAGE=en_US:en
+ENV LC_ALL=en_US.UTF-8
+
+RUN useradd -m -s /bin/bash -G sudo sandbox && \
+  echo 'sandbox ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+
+ENV GIT_USER_NAME="sandbox"
+ENV GIT_USER_EMAIL="sandbox@example.com"
+ENV WINDOWS_USERNAME="sandbox"
+ENV GITHUB_USERNAME="sandbox"
+ENV SANDBOX=1
+
+ENV FONTCONFIG_PATH="/etc/fonts"
+
+USER sandbox
+WORKDIR /home/sandbox
+
+RUN mkdir -p /home/sandbox/.local/share \
+  && mkdir -p /home/sandbox/workspaces/github.com/sandbox \
+  && mkdir -p /home/sandbox/.config \
+  && mkdir -p /home/sandbox/.ssh
+
+CMD ["/bin/bash"]

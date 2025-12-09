@@ -1,0 +1,74 @@
+FROM ubuntu:24.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=Asia/Tokyo
+
+ARG LOCAL_UID=1000
+ARG LOCAL_GID=1000
+
+RUN apt-get update && apt-get install -y \
+  sudo \
+  curl \
+  git \
+  fontconfig \
+  locales \
+  ca-certificates \
+  software-properties-common \
+  wget \
+  unzip \
+  python3 \
+  python3-pip \
+  && rm -rf /var/lib/apt/lists/*
+
+RUN add-apt-repository -y ppa:fish-shell/release-4 && \
+  apt-get update && \
+  apt-get install -y fish && \
+  rm -rf /var/lib/apt/lists/*
+
+RUN curl -fsSL https://deb.nodesource.com/setup_24.x | bash - && \
+  apt-get install -y nodejs
+
+RUN locale-gen en_US.UTF-8 ja_JP.UTF-8
+ENV LANG=en_US.UTF-8
+ENV LANGUAGE=en_US:en
+ENV LC_ALL=en_US.UTF-8
+
+RUN if ! getent group ${LOCAL_GID} >/dev/null 2>&1; then \
+      groupadd -g ${LOCAL_GID} ci; \
+    fi && \
+    if ! getent passwd ${LOCAL_UID} >/dev/null 2>&1; then \
+      useradd -m -s /bin/bash -u ${LOCAL_UID} -g ${LOCAL_GID} ci; \
+    else \
+      existing_user=$(getent passwd ${LOCAL_UID} | cut -d: -f1) && \
+      usermod -aG ${LOCAL_GID} ${existing_user} 2>/dev/null || true; \
+    fi && \
+    echo 'ci ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers && \
+    echo 'ubuntu ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers 2>/dev/null || true
+
+WORKDIR /workspaces
+
+RUN curl -L "https://github.com/mvdan/sh/releases/download/v3.8.0/shfmt_v3.8.0_linux_amd64" \
+   -o /tmp/shfmt && \
+   mv /tmp/shfmt /usr/local/bin/shfmt && \
+   chmod +x /usr/local/bin/shfmt
+
+RUN curl -L "https://github.com/JohnnyMorganz/StyLua/releases/download/v2.1.0/stylua-linux-x86_64.zip" \
+    -o /tmp/stylua.zip && \
+    cd /tmp && unzip stylua.zip && \
+    mv stylua /usr/local/bin/stylua && \
+    chmod +x /usr/local/bin/stylua
+
+RUN npm install -g prettier@3.6.2
+
+RUN wget -q https://packages.microsoft.com/config/ubuntu/24.04/packages-microsoft-prod.deb -O /tmp/packages-microsoft-prod.deb && \
+  dpkg -i /tmp/packages-microsoft-prod.deb && \
+  apt-get update && \
+  apt-get install -y powershell && \
+  rm -rf /var/lib/apt/lists/*
+
+RUN mkdir -p /workspaces/.config && \
+    chown -R ${LOCAL_UID}:${LOCAL_GID} /workspaces
+
+USER ${LOCAL_UID}
+
+CMD ["/bin/bash"]
